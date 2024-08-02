@@ -18,6 +18,8 @@ dist/
 
 # Environment files
 .env
+.env.couchbase
+.env.*
 
 # System files
 .DS_Store
