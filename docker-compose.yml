@@ -18,6 +18,17 @@ services:
     depends_on:
       - couchbase
 
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "8080:80"
+    networks:
+      - fullstack_network
+    depends_on:
+      - couchbase      
+
   couchbase:
     build:
       context: ./couchbase
@@ -46,6 +57,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3      
+
+  proxy:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: proxy
+    ports:
+      - "80:80"     # HTTP port
+      - "443:443"   # HTTPS port
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ${LOGS_DIR}:/var/log/nginx
+    networks:
+      - fullstack_network
+    depends_on:
+      - backend
 
 volumes:
   couchbase_data:
