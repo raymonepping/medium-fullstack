@@ -49,14 +49,3 @@ if [ "$merge_choice" == "y" ]; then
     echo "Switching back to main branch..."
     git checkout main
 fi
-
-# Optionally, update the `main` branch with the latest changes from `master`
-read -p "Do you want to update 'main' with the latest changes from 'master'? (y/n): " update_choice
-
-if [ "$update_choice" == "y" ]; then
-    echo "Pulling latest changes from remote master into main..."
-    git pull origin master
-    
-    echo "Pushing updated 'main' to remote..."
-    git push origin main
-fi
