@@ -1,0 +1,55 @@
+services:
+
+  backend:
+    build:
+      context: ./backend          
+    container_name: backend    
+    ports:
+      - "3000:3000"  
+    environment:
+      - COUCHBASE_ENDPOINT=couchbase://couchbase
+      - COUCHBASE_USERNAME=repping
+      - COUCHBASE_PASSWORD=couchbase
+      - COUCHBASE_BUCKET=demo
+    volumes:
+      - ${LOGS_DIR}:/usr/src/app/logs
+    networks:
+      - fullstack_network
+    depends_on:
+      - couchbase
+
+  couchbase:
+    build:
+      context: ./couchbase
+      dockerfile: Dockerfile
+    container_name: couchbase
+    hostname: couchbase.lan
+    platform: linux/arm64    
+    networks:
+      - fullstack_network
+    ports:
+      - "8091:8091"    # Management Port
+      - "8092:8092"    # Internal Cluster Manager Port
+      - "8093:8093"    # Query Service Port
+      - "8094:8094"    # Full Text Search (FTS) Port
+      - "8095:8095"    # Analytics Service Port
+      - "8096:8096"    # Eventing Service Port
+      - "8097:8097"    # Backup Service Port
+      - "9102:9102"    # Index Service Port
+      - "11210:11210"  # Data Service Port
+      - "11211:11211"  # Memcached Data Service Port
+    volumes:
+      - couchbase_data:/opt/couchbase/var
+      - ${LOGS_DIR}:/opt/couchbase/var/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8091/pools/default"]
+      interval: 10s
+      timeout: 5s
+      retries: 3      
+
+volumes:
+  couchbase_data:
+
+networks:
+  fullstack_network:
+    driver: bridge
